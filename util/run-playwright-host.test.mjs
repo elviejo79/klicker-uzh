@@ -410,7 +410,7 @@ test('report mode never reconciles a runtime and respects the prefix terminator'
     dependencies
   )
   assert.equal(
-    calls.some(({ command }) => command === 'sh'),
+    calls.some(({ command }) => command === 'bash'),
     false
   )
   assert.deepEqual(pnpmCalls(calls).at(-1).args, [
@@ -461,10 +461,10 @@ function commandIndex(calls, command, firstArg) {
   )
 }
 
-// The runtime reconciliation runs through a POSIX tee wrapper:
-// ['sh', '-c', script, 'playwright-host-ensure', <devrouter>, 'ensure', ...]
+// The runtime reconciliation runs through a bash tee wrapper (pipefail):
+// ['bash', '-c', script, 'playwright-host-ensure', <devrouter>, 'ensure', ...]
 function ensureCall(calls) {
-  const call = calls.find(({ command }) => command === 'sh')
+  const call = calls.find(({ command }) => command === 'bash')
   assert.ok(call, 'ensure invocation missing')
   return call
 }
@@ -1003,7 +1003,7 @@ test('phase timings are reported for successful and failed runs', () => {
   assert.ok(completed.browser > 0)
 
   const failure = createLauncherHarness({
-    failWhen: ({ command }) => command === 'sh',
+    failWhen: ({ command }) => command === 'bash',
   })
   assert.throws(
     () => runPlaywrightHost(['A-login.spec.ts'], failure.dependencies),
@@ -1101,7 +1101,7 @@ test('cold preparation aborts before reconciliation when stopping fails', () => 
   )
   assert.equal(commandIndex(harness.calls, 'pnpm', 'install'), -1)
   assert.equal(
-    harness.calls.some(({ command }) => command === 'sh'),
+    harness.calls.some(({ command }) => command === 'bash'),
     false
   )
 })
@@ -1121,7 +1121,7 @@ test('cold preparation aborts before reconciliation when install fails', () => {
     commandIndex(harness.calls, '/synthetic/bin/devrouter', 'stop') >= 0
   )
   assert.equal(
-    harness.calls.some(({ command }) => command === 'sh'),
+    harness.calls.some(({ command }) => command === 'bash'),
     false
   )
 })
@@ -1144,7 +1144,7 @@ test('warm preparation aborts before reconciliation when a host build fails', ()
     -1
   )
   assert.equal(
-    harness.calls.some(({ command }) => command === 'sh'),
+    harness.calls.some(({ command }) => command === 'bash'),
     false
   )
 })
@@ -1200,7 +1200,7 @@ test('show-report does not reconcile the runtime', () => {
   runPlaywrightHost(['--show-report'], harness.dependencies)
 
   assert.equal(
-    harness.calls.some(({ command }) => command === 'sh'),
+    harness.calls.some(({ command }) => command === 'bash'),
     false
   )
   assert.ok(

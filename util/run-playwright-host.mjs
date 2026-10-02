@@ -336,12 +336,14 @@ function runRuntimeEnsure(runtime, args) {
   // runs through a tee instead of a captured pipe; the devrouter helper
   // reports provider-queue contention on that output and the wait belongs in
   // the phase summary separately from real work.
+  // bash, not sh: `pipefail` is required to see a failed ensure through the
+  // tee, and Debian/Ubuntu `/bin/sh` is dash, which rejects the option.
   const telemetryFile = join(
     tmpdir(),
     `playwright-host-ensure-${process.pid}.log`
   )
   runtime.commandRunner(
-    'sh',
+    'bash',
     [
       '-c',
       'set -o pipefail; ensure_bin="$1"; shift; "$ensure_bin" "$@" 2>&1 | tee "$' +
