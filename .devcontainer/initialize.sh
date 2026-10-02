@@ -7,6 +7,13 @@ node "$SCRIPT_DIR/../util/generate-dependency-mounts.mjs" "$SCRIPT_DIR/.."
 CERT_DIR="$SCRIPT_DIR/certs"
 PNPM_STORE_VOLUME='klicker-uzh-pnpm-store-v1'
 
+# DevPod chowns the workspace to the container user (root). On Linux that writes
+# through the bind mount and locks the host out of its own checkout, so record
+# the owner here — while the tree is still host-owned — for post-start to restore.
+if [ "$(uname -s)" = 'Linux' ]; then
+  echo "$(id -u):$(id -g)" >"$SCRIPT_DIR/.host-owner" 2>/dev/null || true
+fi
+
 # TLS trust is optional for plain localhost mode, so keep certificate setup
 # best-effort when mkcert is not installed on the host.
 mkdir -p "$CERT_DIR"

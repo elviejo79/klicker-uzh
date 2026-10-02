@@ -27,4 +27,8 @@ RUN npm install -g pnpm@11.5.0
 # Use a stable path for the machine-local store mounted by Compose. (GOTCHAS #9)
 RUN pnpm config set store-dir "$PNPM_HOME/.pnpm-store"
 
+# On Linux hosts the workspace bind mount keeps its host ownership, so git
+# running as root here sees a foreign owner and refuses the repository.
+RUN git config --system safe.directory /workspaces/klicker-uzh
+
 WORKDIR /workspaces/klicker-uzh

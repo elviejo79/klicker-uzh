@@ -76,6 +76,8 @@ output/
 .devcontainer/.hatchet.env.tmp.*
 packages/graphql/.env.tmp.*
 .devcontainer/.runtime/
+# Devcontainer: host uid:gid recorded by initialize.sh (machine-local)
+.devcontainer/.host-owner
 # Devrouter-generated selective Dev Container config (runtime state, not source)
 .devcontainer/devcontainer.devrouter.json
 .devcontainer/docker-compose.dependencies.yml

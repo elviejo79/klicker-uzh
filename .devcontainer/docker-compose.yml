@@ -165,7 +165,13 @@ services:
       # Hatchet client token automatically minted by hatchet-lite-dev to /config/authdisabled-token
       - hatchet_lite_config:/config:ro
       # Local mkcert root CA (prepared by initializeCommand on host) for server-side TLS trust.
-      - '${DEVROUTER_MKCERT_CAROOT:-./certs}/rootCA.pem:/etc/devrouter/mkcert-rootCA.pem:ro'
+      # Long syntax: devrouter validates this model with `docker compose config
+      # --no-interpolate`, which leaves `${VAR:-default}` literal and makes the
+      # colon in the default value split a short-syntax spec ("too many colons").
+      - type: bind
+        source: ${DEVROUTER_MKCERT_CAROOT:-./certs}/rootCA.pem
+        target: /etc/devrouter/mkcert-rootCA.pem
+        read_only: true
     command: sleep infinity
     depends_on:
       postgres:

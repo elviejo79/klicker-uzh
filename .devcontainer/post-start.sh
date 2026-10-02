@@ -5,6 +5,15 @@
 set -euo pipefail
 ROOT="${KLICKER_DEVCONTAINER_ROOT:-/workspaces/klicker-uzh}"
 ROOT="$(cd "$ROOT" && pwd)"
+
+# Give the bind-mounted checkout back to the host owner recorded by
+# initialize.sh; DevPod's workspace chown otherwise leaves it root-owned and
+# host-side git and devrouter can no longer write to it.
+HOST_OWNER_FILE="$ROOT/.devcontainer/.host-owner"
+if [ -s "$HOST_OWNER_FILE" ] && [ "$(id -u)" = '0' ]; then
+  chown -R "$(cat "$HOST_OWNER_FILE")" "$ROOT" || true
+fi
+
 bash "$ROOT/util/dev-runtime.sh" require-bootstrap
 cd "$ROOT"
 
